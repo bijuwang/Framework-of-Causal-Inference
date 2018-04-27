@@ -1,0 +1,238 @@
+\documentclass{article}
+\usepackage{amssymb}%math character
+\usepackage{amsmath}%math formula
+\usepackage{graphicx}%graph
+\usepackage{xcolor}%color
+\usepackage{layout}
+\usepackage{mathrsfs}%curlycue
+\usepackage[labelfont = bf, textfont = bf, labelsep = period]{caption}
+\usepackage{hyperref}
+
+\textwidth=160mm
+\textheight=225mm
+\headsep=0mm
+\headheight=0mm
+\hoffset=-20mm
+
+
+\begin{document}
+%\pagestyle{empty}
+%\title{\vspace{50mm}\Huge\bf Analysis and Prediction for Household's Reading Expenditure}
+%\author{Xiaokang Liu, Biju Wang\\[5mm]
+%\texttt{Email:xiaokang.liu@uconn.edu}\\
+%\texttt{\hspace{5mm}bijuwang@uconn.edu}}
+%\date{}
+%\maketitle
+%\thispagestyle{empty}
+%\newpage
+%%\layout
+%
+%\thispagestyle{empty}
+%\begin{abstract}
+%
+%
+%\end{abstract}
+%{\bf Key Words:} Prediction, Multiple Linear Regression(MLR), Generalized Linear Model(GLM)
+%\newpage
+%
+%\setcounter{page}{1}
+\section{\href{/Users/wangbiju/Documents/Documents/UConn/Research/Single_Arm/Meeting_Notes/03/27/2018.txt}{Framework of Yang's Work (meeting note 03/27/2018, paper 5)}}
+\textbf{\indent Basic Assumptions}
+\begin{itemize}
+\item Use $\mathscr{D}_{T}$ to denote the treatment data, use $\mathscr{D}_{H}$ to denote the history data without treatment.
+\item $(y_{i}, \mathbf{x}_{i})\in\mathscr{D}_{T}, ~i=1, \cdots, n$, $(z_{j}, \mathbf{X}_{j})\in\mathscr{D}_{H},~j=1, \cdots, N$. $y$ represents a endpoint in the treatment group, $\mathbf{x}$ represents the covariates in the treatment group, $z$ represents the same endpoint with $y$ but in the history group, $\mathbf{X}$ represents the same covariates with $\mathbf{x}$. Also, we assume $n<N$ and $\{\mathbf{x}_{i}|i=1,\cdots, n\}\subseteq\{\mathbf{X}_{j}|j=1,\cdots, N\}$.
+\end{itemize}
+
+\textbf{Goals}
+\begin{itemize}
+\item As $y_{i}$ represents the endpoint if the $i$th patient receives the treatment, $z_{j}$ represents the same endpoint if the $j$th patient doesn't receive the treatment. What we'd like to learn from $\mathscr{D}_{H}$ is to estimate the endpoint $z_{i}$ if the $i$th patient doesn't receive the treatment. That is, for data $(y_{i}, \mathbf{x}_{i})\in\mathscr{D}_{T}$, we will construct the corresponding data $(z_{i}, \mathbf{x}_{i})$.
+\item A simpler question is that in $(y_{i}, \mathbf{x}_{i})$ we can estimate $\hat{E}(y)=\bar{y}$, we need to find the corresponding $\hat{E}(z)$.
+\end{itemize}
+
+\textbf{Methods}
+\begin{itemize}
+\item As $\{\mathbf{x}_{i}|i=1,\cdots, n\}\subseteq\{\mathbf{X}_{j}|j=1,\cdots, N\}$, then it's easy to find the initial estimate of $E(z)$ for treatment group. 
+\begin{enumerate}
+\item Find the estimate of conditional expectation.\\
+$$\hat{E}(z|\mathbf{x}_{i})=\frac{\sum^{N}_{j=1}I(\mathbf{X}_{j}=\mathbf{x}_{i})z_{j}}{\sum^{N}_{j=1}I(\mathbf{X}_{j}=\mathbf{x}_{i})}$$
+This is the information we learnt from $\mathscr{D}_{H}$.
+\item Integrate the estimated density of $\mathbf{x}$ in $\mathscr{D}_{T}$.
+$$\hat{E}(z)=\sum^{n}_{i=1}\hat{E}(z|\mathbf{x}_{i})\frac{\sum^{n}_{k=1}I(\mathbf{x}_{k}=\mathbf{x}_{i})}{n}$$
+\end{enumerate}
+
+\item Notice that we only use $\mathbf{X}$'s that are the same with $\mathbf{x}$'s, a lot of information in $\mathscr{D}_{H}$ we ignored. Even though $\mathbf{X}_{j}\neq \mathbf{x}_{i}$, the conditional density $f(z|\mathbf{X}_{j})$ may have similar pattern with $f(z|\mathbf{x}_{i})$, then $\hat{E}(z|\mathbf{X}_{j})$ will be close to $\hat{E}(z|\mathbf{x}_{i})$.
+\item The more similar pattern between $f(z|\mathbf{X}_{j})$ and $f(z|\mathbf{x}_{i})$, the more weight we should give to $\hat{E}(z|\mathbf{X}_{j})$ in estimating $\hat{E}(z|\mathbf{x}_{i})$
+\begin{enumerate}
+\item Reformulate $\hat{E}(z|\mathbf{x}_{i})$.
+$$\hat{E}(z|\mathbf{x}_{i})=\frac{\sum^{N}_{j=1}I(\mathbf{X}_{j}\in S(\mathbf{x}_{i}))w_{ji}z_{j}}{\sum^{N}_{j=1}w_{ji}I(\mathbf{X}_{j}\in S(\mathbf{x}_{i}))}$$
+In the formula above, $S(\mathbf{x}_{i})$ represents the set of $\mathbf{X}$ whose conditional density $f(z|\mathbf{X})$ is similar with $f(z|\mathbf{x}_{i})$, and the weight $w_{j}$ measures this similarity. Let's say $L_{ji}(f(z|\mathbf{X}_{j}), f(z|\mathbf{x}_{i}))$ measures the similarity between $f(z|\mathbf{X}_{j})$ and  $f(z|\mathbf{x}_{i})$, then $L_{ji}\varpropto\frac{1}{w_{ji}}$.
+\item Recalculate $\hat{E}(z)$
+$$\hat{E}(z)=\sum^{n}_{i=1}\hat{E}(z|\mathbf{x}_{i})\frac{\sum^{n}_{k=1}I(\mathbf{x}_{k}=\mathbf{x}_{i})}{n}$$
+\end{enumerate}
+
+
+\end{itemize}
+
+\hrulefill\fbox{\textbf{04/03/2018}}\hrulefill
+\section{\href{/Users/wangbiju/Documents/Documents/UConn/Research/Single_Arm/Meeting_Notes/04/03/2018.txt}{Framework of Yang's Work (meeting note 04/03/2018, paper 4, 5, 6, 7)}}
+\textbf{\indent Modefied Basic Assumptions}
+\begin{itemize}
+\item $(y_{i}, \mathbf{x}_{i})\in\mathscr{D}_{T}, ~i=1, \cdots, n$, $(z_{j}, \mathbf{X}_{j})\in\mathscr{D}_{H},~j=1, \cdots, N$. $y$ represents a endpoint in the treatment group, $\mathbf{x}$ represents the covariates in the treatment group, $z$ represents the same endpoint with $y$ but in the history group, $\mathbf{X}$ represents the same covariates with $\mathbf{x}$. Also, we assume $n<N$ and $\{\mathbf{x}_{i}|i=1,\cdots, n\}$ is not necessarily in $\{\mathbf{X}_{j}|j=1,\cdots, N\}$.
+\end{itemize}
+
+\textbf{Goals}
+\begin{itemize}
+\item A simpler question is that in $(y_{i}, \mathbf{x}_{i})$ we can estimate $\hat{E}(y)=\bar{y}$, we need to find the corresponding $\hat{E}(z)$.
+\end{itemize}
+
+\textbf{Methods}
+\begin{enumerate}
+\item Based on the data in $\mathscr{D}_{T}$ and $\mathscr{D}_{H}$, we use logistic regression to estimate the propensity score $e(x)=P(T=1|x)$ for each individual in each group where $T=1$ represents the individual is from $\mathscr{D}_{T}$ and $T=0$ represents the individual is from $\mathscr{D}_{H}$. A good property of propensity is that $T\perp x|e(x)$ such that we can think the individuals have the same $e(x)$ are randomly assigned to treatment and history group.
+\item For individuals in $\mathscr{D}_{T}$, we have $n$ propensity scores $e(x_{1}), \cdots, e(x_{n})$, and for individuals in $\mathscr{D}_{H}$ we have $N$ propensity scores $e(X_{1}), \cdots, e(X_{N})$ and $n<N$.
+\item To find a matched set of individuals in $\mathscr{D}_{T}$ from the individuals in $\mathscr{D}_{H}$. An intuitive way is for each $e(x_{i}),~i=1,\cdots, n$, we select the closest $e(X_{j}),~j=1, \cdots, N$. Then based on $\mathscr{D}_{H}$, we generates a subset which matches $\mathscr{D}_{T}$, we denote this subset by $\mathscr{D}^{0}_{H}$. Thus we have an initial estimate $\hat{E}^{0}(z)$.
+\item Obviously, we only use a few history data. Although subclassification, full matching and weighting methods use all of the history data, they are covariates-driven method and don't use the response value. 
+\item A simple way to use all the data in history group is to do a linear regression on $\mathscr{D}_{H}$ and then plug the values of $x_{i},~i=1,\cdots,n$ in the regression equation to get $\hat{z}_{i},~i=1,\cdots,n$. But this method is a little coarse as not every point of $(z_{j}, X_{j}),~j=1,\cdots, N$ makes a good contribution to predict $(z_{i}, x_{i}),~i=1,\cdots,n$.
+\item As we have $\mathscr{D}^{0}_{H}$ whose covariates are very similar with $x_{i},~i=1,\cdots,n$. We do a regression on $\mathscr{D}^{0}_{H}$ and based on regression function $f(X)$, we can find the points in $\mathscr{D}_{H}-\mathscr{D}^{0}_{H}$ whose value of $z_{j}$ is close with the estimated value $f(X_{j})$. This indicates $(z_{j}, X_{j})$ can contribute to predicte $(z_{i}, x_{i})$ such that we use the data out of $\mathscr{D}^{0}_{H}$.
+\item We incorporate the points in 6 into $\mathscr{D}^{0}_{H}$ to get another subset $\mathscr{D}^{1}_{H}$. For these incorporated points, we need to add some weights on them. As the points found in 6 have the same pattern with the data in $\mathscr{D}^{0}_{H}$, this is what we want. We also wish the propensity scores of these points could be similar with the ones in $\mathscr{D}^{0}_{H}$. Under this guide, suppose the points chosen in 6 are $\{(z_{j_{1}}, X_{j_{1}}),\cdots,(z_{j_{k}}, X_{j_{k}})\}$, the correpsonding weights are $w_{1}, \cdots, w_{k}$, and $\mathscr{D}^{0}_{H}=\{(z_{1}, X_{1}),\cdots,(z_{n}, X_{n})\}$, we need to solve:
+\begin{gather*}
+\mathop{\text{min}}_{w_{1},\cdots,w_{k}}~\sum^{n}_{p=1}[e(X_{p})-\sum^{k}_{i=1}w_{i}e(X_{j_{i}})]^{2}\\
+\sum^{k}_{i=1}w_{k}=1
+\end{gather*}
+\item From $\mathscr{D}^{1}_{H}$, we do the same thing with 6, and get $\mathscr{D}^{2}_{H}\rightarrow\mathscr{D}^{3}_{H}\rightarrow\cdots\mathscr{D}_{H}$ until all of the data in $\mathscr{D}_{H}$ are included. Then we use the weighted average of $X_{j},~j=1,\cdots,N$ as an estimate of $\hat{E}(z)$ corresponding to $\hat{E}(y)$.
+\end{enumerate}
+
+
+\hrulefill\fbox{\textbf{04/10/2018}}\hrulefill
+\section{Single Arm Study---Descriptions and Methods' Summary}
+\subsection{Descriptions}
+Single arm clinical trial is a trial in which everyone enrolled in this trial receives the experimental therapy. In this situation, no control groups are available. However, often times, there may be a large amount of historical data out there for a certain disease. It may be from natural history studies or research databases. It may also be from past clinical trials in the disease area. A typical example in a single arm setting is to use natural history data to provide a good historical control to evaluate the treatment effect demonstrated in a current single arm clinical trial. The crucial question here is how to efficiently and accurately utilize all available data to estimate the treatment effect or causal effect.\\
+One of the key benefits of randomized experiments for estimating causal effects is that the treated and control groups are guaranteed to be only randomly different from one another on all background covariates, both observed and unobserved. When estimating causal effects using observational data, it is desirable to replicate a randomized experiment as closely as possible by obtaining treated and control groups with similar covariate distributions. This goal can often be achieved by choosing well-matched samples of the original treated and control group, thereby reducing bias due to the observed covariates. \par
+
+\subsection{Assumptions}
+\textbf{Notations}\\[2mm]
+\begin{tabular}{@{}l@{\hspace{2mm}}l}
+$U$: & set of unmeasured background factor\\
+$W$: & set of measured confounders\\
+%         & - $W(1)$ set of measured confounders in the treatment group\\
+%         & - $W(0)$ set of measured confounders in the control group\\
+%         & - Notice the elements of $W(1)$ and $W(0)$ are the same. The difference between them\\
+%         &  \phantom{-} are the distributions\\
+$A$: & the exposure\\
+        & - $A=1$ for the exposure = treatment = intervention\\
+        & - $A=0$ for unexposed = untreated = control\\
+$Y$: & the outcome\\
+        & - $Y(1)$ for the outcome if the patients are treated\\
+        & - $Y(0)$ for the outcome if the same patients are not treated\\
+        & - $Y(1)$ and $Y(0)$ cannot be obtained at the same time\\
+%        & - $Y(1)|A=1$ for the outcome of treated patients if they are treated\\
+%        & - $Y(0)|A=1$ for the outcome of treated patients if they are not treated\\
+%        & - $Y(1)|A=0$ for the outcome of untreated patients if they are treated\\
+%        & - $Y(0)|A=0$ for the outcome of untreated patients if they are not treated\\
+%        & $W$ itself is a binary random variabe, $Y(1)$ is a random variable, $Y(0)$ is another random variable\\
+\end{tabular}\\[2mm]
+\textbf{Target Causal Parameter}\\
+The target causal parameter is defined by:
+$$E[Y(1)]-E[Y(0)]$$
+which is known as Average Treatment Effect (ATE). ATE is the \textsf{\underline{effect on all individuals}} (treatment and control). Also notice $E[Y|A=1]\neq E[Y(1)], ~E[Y|A=0]\neq E[Y(0)]$.\\
+Another common estimand is 
+$$E[Y(1)|A=1]-E[Y(0)|A=1]$$
+which is the \textsf{\underline{effect for those in the treatment group}} and is known as Average effect of the Treatment on the Treated (ATT). In single arm study, we are often interested in ATT.\\[2mm]
+\textbf{Assumptions}\\
+\emph{\underline{For ATE}}:\\
+To write the target causal parameter as some functions of the observed data distribution, we need to add some assumptions in non-experimental or observational studies (for the randomized experiments, the assumptions are automatically satisfied):
+\begin{itemize}
+\item $Y(a)\perp A|W$ which is known as back-door criterion OR randomization assumption OR strongly ignorable treatment assignment OR no hidden bias OR unconfounded
+\item $P(A = a|W = w)>0$ for all $w$ with $P(W=w)>0$ which is known as positivity
+\end{itemize}
+Under this two assumptions, we have
+\begin{align*}
+E[Y(a)] & =E[E[Y(a)|W]]\\
+           & =E[E[Y(a)|A=a, W]]\\
+           & =E[E(Y|A=a, W)]
+\end{align*}
+Specifically,
+$$E[Y(1)]=E[E[Y(1)|W]]=E[E[Y(1)|A=1, W]]=E[E[Y(1)|A=0, W]]$$
+This implies given $W$, the expectation of $Y(1)$ are the same for the whole group, the treatment group and the control group. Namely, given $W$ no other confounders exist between treatment and control group. Otherwise, we need to remove the effect of that confounder. We can also think that $E[Y(1)|A=1, W]=E[Y(1)|A=0, W]$ and $E[Y(0)|A=0, W]$ differ from each other only due to whether the patients are treated or not, thus once we set $Y(0)$ equal $Y(1)$, they become the same and this is the above mentioned.\\
+An additional assumption is the Stable Unit Treatment Value Assumption (SUTVA) which states that the outcomes of one individual are not affected by the treatment assignment of any other individuals.\\[2mm]
+\emph{\underline{For ATT}}:\\
+Under above two assumptions, we have
+\begin{align*}
+E[Y(0)|A=1] & =E[E[Y(0)|A=1, W]]\\
+                   & =E[E[Y(0)|A=0, W]]\\
+                   & =E[Y(0)|A=0]
+\end{align*}
+
+\subsection{Key Concepts and Methods}
+For a randomized experiment, the causal effect can be gained directly. And matching is a common used method to \textsf{replicate a randomized experiment} as closely as possible by obtaining treated and control group with similar covariate distributions for observational data, thereby reducing bias due to the covariates. \\
+A common feature of matching methods is that the outcome are not used in the matching process. Even if the outcome values are available at the time of the matching, the outcome values should not be used n the matching process, to preclude the selection of a matched sample that leads to a desired or even the appearance of doing so.\\
+In order to do the matching method for observational study, we need to first define the measure of distance, and then implement a matching method. We also need to assess the quality of the resulting matched samples after finishing matching.\\
+Matching exactly, by mahalanobis or propensity score or linear propensity score are often used. And these distances can also be used together.\\
+\subsubsection{Propensity Score}
+The propensity score for individual $i$ is defined as the probability of receiving the treatment given the observed covariates: $e_{i}(W_{i})=P(A=1|W_{i})$.
+\begin{itemize}
+\item At each value of the propensity score, the distribution of the covariates $W$ defining the propensity is the same in the treated and control groups. That is, $W\perp A|e(W)$.
+\item If treatment assignment is ignorable given the covariates, the treatment assignment is also ignorable given the propensity score. That is, if $Y(a)\perp A|W$ and $P(A=a|W=w)>0$, then $Y(a)\perp A|e(W)$ and $P(A=a|e(W))>0$. What's more, $E[Y(1)-Y(0)|e(W)]=E[Y|A=1, e(W)]-E[Y|A=0, e(W)]$.
+\end{itemize}
+\subsubsection{Prognostic Score}
+Prognosis scores are essentially the predicted outcome each individual would have under the control condition. If $Y(0)\perp W|\Psi(W)$, then $\Psi(W)$ is a prognostic score.
+\subsubsection{Some Thinkings}
+To estimate the average effect of the treatment on the treated (ATT), we have the following thinkings which establish on the ignorability and positivity assumptions.
+
+\begin{enumerate}
+\item Select propensity score as the distance, we first find a subset of control group which has the closeast distance to our treatment group, we denote this subset as $\mathscr{D}^{0}_{C}$, and the corresponding initial estimate of $E[Y(0)]$ is denoted as $E^{0}[Y|A=0]$.
+\item In the first step, we only use a few data in the control group. Although subclassification, full matching and weighting methods use all of the history data, they are covariates-driven method and don't use the response values.
+\item A simple way to use all the data in control group is to establish a model between $W$ and $Y(0)$ and predict the values $Y(0)$ at each covariate value of treatment group, then we can also get an estimate of $E[Y(0)]$. But this way is a little coarse as not every data in control group make a good contribution to the prediction.
+\item Because our interest is in estimating $Y(0)$ based on the covariates in treatment group and we already have dataset $\mathscr{D}^{0}_{C}$ whose covariates are similar with the ones in treatment group. Thus we can establish a model on $\mathscr{D}^{0}_{C}$ and judge if other data in control group can make a good contribution to predict $Y(0)$ under the covariates in treatment group. Then after incorporating these data we can expand $\mathscr{D}^{0}_{C}$ to $\mathscr{D}^{1}_{C}$.
+\item Notice that although the incorporated data can make a good contritution for predicting while there propensity scores may be far away from the propensities of treatment group. And this can introduce a confounding effect. 
+\end{enumerate}
+
+
+\subsection{References}
+\begin{enumerate}
+\item Stuart EA. Matching methods for causal inference: a review
+and a look forward. Stat Sci [online]
+\item Rosenbaum, P. R. and Rubin, D. B. (1983b). The central role of the propensity score in observational studies for causal effects. Biometrika 70, 41–55
+\item Hansen, B. B. (2008). The prognostic analogue of the propensity score. Biometrika 95, 2, 481-488
+\item Laura B. B. and Hachem S. (2018). Introductory \& Advanced Methods for Causal Inference. NESS2018 Short Course
+\end{enumerate}
+
+
+
+\hrulefill\fbox{\textbf{04/17/2018}}\hrulefill\\
+
+\hrulefill\fbox{\textbf{04/24/2018}}\hrulefill
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%\section{Description of Data}
+%
+%\begin{table}[h!]
+%
+%\end{table}
+%
+%\begin{figure}[h!]
+%\begin{center}
+%\includegraphics[scale=0.4]{hist_reading.jpeg}\\
+%\caption{Histogram of Different Version of Reading Expenditure}\label{figure:hist}
+%\end{center}
+%\end{figure}
+%
+%\section{Models}
+%
+%\section{Analysis of Data}
+%
+%\subsection{Binary Regression Model}
+%
+%\section{Summary}
+%
+%\begin{thebibliography}{99}
+%\bibitem{website1} Bureau of Labor Statistics. Consumer Expenditures and Income: Collections \& Data Sources. https://www.bls.gov/opub/hom/cex/data.htm
+%
+%\end{thebibliography}
+
+%\section*{Appendix}
+\end{document}
